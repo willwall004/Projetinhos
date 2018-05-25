@@ -1,0 +1,130 @@
+#ifdef _WIN32
+#include <windows.h>
+#define _USE_MATH_DEFINES
+#endif
+#define PI 3.14159265f // PI tá tudo em maiúsculo porque constantes se escrevem tudo em maiúsculo
+#include <math.h>
+
+#include <GL/gl.h> // funcoes principais
+#include <GL/glu.h> // funcoes auxiliares, mas tb facilita em alguns detalhes
+#include <GL/glut.h> /* biblioteca de gerenciamento de janelas, input...*/
+
+#include <stdio.h>
+#include <time.h>
+
+void drawCircle(float r) //radius ou raio
+{
+	glBegin(GL_POLYGON);
+	for (float ang = 0; ang <= 2 * PI; ang += 0.01f)
+	{
+		float x = r*sin(ang);
+		float y = r*cos(ang);
+		glVertex2f(x, y);
+	}
+	glEnd();
+}
+
+void display()
+{
+	time_t tNow = time(nullptr);
+	tm* tmNow = localtime(&tNow);
+
+	float angS = PI / 30 * tmNow -> tm_sec;
+	float angM = PI / 30 * tmNow -> tm_min + angS/60;
+	float angH = PI / 6 * tmNow->tm_hour + angM/60;
+
+
+	//define a cor do fundo
+	glClearColor(0.75, 0.75, 0.75, 1); // R, G, B, A de 0 a 1, A (alpha) nao e utilizado
+
+												   //limpa a tela com a cor definida no glClearColor
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	//define a cor usada por todos os vertices definidos apos
+
+
+	glColor3f(0, 0, 0);
+	drawCircle(1);
+
+
+	glColor3f(1, 1, 1); // R, G, B de 0 a 1
+
+						// define os vertices de triangulo (ver OpenGL primitives no Google Imagens)
+	
+	glLineWidth(2.5);
+
+	glBegin(GL_LINES);
+	
+	for (float k = 0; k <= 2 * PI; k += PI / 30)
+	{
+		float x;
+		float y;
+
+		x = 1 * sin(k);
+		y = 1 * cos(k);
+		glVertex2f(x, y);
+		x = 0.95f * sin(k);
+		y = 0.95f * cos(k);
+		glVertex2f(x, y);
+	}
+
+	for (float j = 0; j <= 2 * PI; j += PI / 6)
+	{
+		float x;
+		float y;
+
+		x = 1*sin(j);
+		y = 1*cos(j);
+		glVertex2f(x, y);
+		x = 0.85f * sin(j);
+		y = 0.85f * cos(j);
+		glVertex2f(x, y);
+		
+	}
+	glColor3f(1, 0, 0);
+	glEnd();
+	// PERGUNTAR PRO DOG SOBRE A CORRRRRRRR
+	
+	glBegin(GL_LINES);
+
+
+		glVertex2f(0, 0);
+		glVertex2f(sin(angS) * 0.8, cos(angS) * 0.8);
+
+		glVertex2f(0, 0);
+		glVertex2f(sin(angM) * 0.72, cos(angM) * 0.65);
+		glVertex2f(0, 0);
+		glVertex2f(sin(angH) * 0.5, cos(angH) * 0.5);
+
+
+	glEnd();
+
+
+	glutSwapBuffers();
+
+	glutPostRedisplay();
+
+
+}
+
+void reshape(int w, int h)
+{
+	// redimensiona a tela
+	glViewport(0, 0, w, h);
+}
+
+
+
+int main(int argc, char* argv[])
+{
+	glutInit(&argc, argv);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
+	glutInitWindowSize(600, 600); //tamanho da janela
+
+	glutCreateWindow("Aula 1"); // cria uma janela com o titulo escolhido
+	glutReshapeFunc(reshape); // funcao que sera chamada para redimensionada a janela
+	glutDisplayFunc(display); // funcao que sera chamada para desenhar
+
+	glutMainLoop(); //loop de eventos do freeglut
+	return 0;
+}
